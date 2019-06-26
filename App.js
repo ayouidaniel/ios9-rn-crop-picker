@@ -1,49 +1,64 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
+import React, { Component } from 'react'
+import { Button, Image, StyleSheet, View} from 'react-native'
+import ImagePicker from 'react-native-image-crop-picker'
 
-import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+export default class App extends Component {
+  state = { image: null }
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+  _openImagePicker = () => {
+    ImagePicker.openPicker({
+      includeBase64: true,
+      mediaType: 'photo',
+      compressImageQuality: 0.4,
+      loadingLabelText: "Custom Loading..."
+    })
+    .then(image => this.setState( { image } ))
+    .catch(e => console.log(e))
+  }
 
-type Props = {};
-export default class App extends Component<Props> {
+  _renderImages = () => {
+    if (this.state.image) {
+      return [
+        <Image key={1} style={styles.image} source={{ uri: this.state.image.path}} />,
+        <Image key={2} style={styles.image} source={{ uri: this.state.image.sourceURL}} />,
+        <Image key={3} style={styles.image} source={{ uri: `data:${this.state.image.mime};base64,${this.state.image.data}`}} />,
+        <Image key={4} style={styles.image} source={{uri : 'https://www.appcoda.com/wp-content/uploads/2015/04/react-native.png'}} />
+      ]
+    } else {
+      return <Image style={styles.image} source={{uri : 'https://www.appcoda.com/wp-content/uploads/2015/04/react-native.png'}} />
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <View style={styles.button}>
+          <Button title="Choose images" onPress={this._openImagePicker}/>
+        </View>
+        <View style={[styles.container]}>
+          {this._renderImages()}
+        </View>
       </View>
-    );
+    )
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
+  button: {
+    backgroundColor: 'gray',
+    width: 150,
+    marginLeft: 110,
+    marginTop: 70,
+    marginBottom: 25
+  },
+  image: {
+    width: 150,
+    height: 150,
+    marginLeft: 110,
     margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
+  }
+})
